@@ -7,6 +7,7 @@ Chatbox with php server (json type) for use on your webpage (upload with ftp) do
 
 ### `npm install`
 to add the node_modules folder
+
 <img src="https://github.com/brenrecorder/chatbox/blob/main/screenchat.png?raw=true"></img>
 
 ### A Visual IDE for React Projects
