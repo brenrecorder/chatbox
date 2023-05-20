@@ -3,7 +3,7 @@
     <h1>React App template for Codux</h1>
 </div>
 
-Chatbox with php server (json type)
+Chatbox with php server (json type) for use on your webpage (upload with ftp) don't forget 'chat.php'
 
 ### `npm install`
 to add the node_modules folder
