@@ -20,8 +20,8 @@ function encrypt_decrypt($action, $string)
     {
         $output = false;
         $encrypt_method = "AES-256-CBC";
-        $secret_key = 'ACCHATSERVER123456789055';
-        $secret_iv = '1939999888885321232345731';
+        $secret_key = 'TBCHATSERVER123456789012';
+        $secret_iv = '1239999888885321232345711';
         // hash
         $key = hash('sha256', $secret_key);    
         // iv - encrypt method AES-256-CBC expects 16 bytes 
