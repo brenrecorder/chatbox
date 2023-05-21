@@ -11,18 +11,20 @@ import $ from 'jquery';
 const Promise = require("bluebird");
 const getJson = require("axios-get-json-response");
 const cheerio = require("cheerio");
-
+const server = "";
 function App() {
 
-
+ const bottomRef = useRef(null);
 
  var [currUser, setcurrUser] =useState('');
  
  var [currPwd, setcurrpassword] =useState('');
-  var [currContact, setCurrContact] =useState('admin');
+  var [currContact, setCurrContact] =useState('');
   var [loggedin, setLoggedin] = useState(false);
+    var [chatactive, setActiveChat] = useState(false);
+
       var [contacts, setContacts] =useState([]);
-      var [currpage, setcurrpage] =useState('');
+      var [currpage, setcurrpage] =useState('login');
       var [chatsb, setChats] = useState([]);
            var [chatmessage, setChatMessage] = useState([]);
     var [newUser, setNewuser] = useState([]);
@@ -34,13 +36,15 @@ function App() {
 
 	  const getPage = (event) => {
     event.preventDefault();
-    const response = axios.get('chat.php?action=viewcontacts&username=' + currUser + "&password=" + currPwd)
+    const response = axios.get(server + 'chat.php?action=viewcontacts&username=' + currUser + "&password=" + currPwd)
   .then(function (response) {
     // handle success
     console.log(response.data);
 //test = response.data;
  setContacts(JSON.parse(JSON.stringify(response.data)));
-
+ setcurrpage('contacts');
+setCurrContact('')
+setLoggedin(true);
 //setIsLoggedIn(true) QUYh4SgF
 
   })
@@ -52,41 +56,32 @@ function App() {
   })
 
   };
-	  function updateUsers() {
-  
-    const response = axios.get('chat.php?action=viewcontacts&username=' + currUser  + "&password=" + currPwd)
+
+
+ const updateUsers = (event) => {
+    const response = axios.get(server+'chat.php?action=viewcontacts&username=' + currUser  + "&password=" + currPwd)
   .then(function (response) {
-    // handle success
-    console.log(response.data);
-//test = response.data;
+    const temp = JSON.parse(JSON.stringify(response.data))
+    if (temp.length != contacts.length) {
  setContacts(JSON.parse(JSON.stringify(response.data)));
-if (contacts.length >0) {
-setLoggedin(true)
-} else {
-setLoggedin(false)
-
-}
-//setIsLoggedIn(true) QUYh4SgF
-
+    }
   })
   .catch(function (error) {
-    // handle error
-
-
     console.log(error);
   })
-
   };
+	
 
 	  const getchatsb = (event) => {
   
-    const response = axios.get('chat.php?action=viewmessage&username=' + currUser + '&adrFrom=' + currContact  + "&password=" + currPwd)
+    const response = axios.get(server+'chat.php?action=viewmessage&username=' + currUser + '&adrFrom=' + currContact  + "&password=" + currPwd)
   .then(function (response) {
     // handle success
     console.log(response.data);
-//test = response.data;
+const temp = JSON.parse(JSON.stringify(response.data))
+    if (temp.length != chatsb.length) {
  setChats(JSON.parse(JSON.stringify(response.data)));
-
+    }
 //setIsLoggedIn(true) QUYh4SgF
 
   })
@@ -96,11 +91,11 @@ setLoggedin(false)
 
     console.log(error);
   })
-
+  getPage('');
   };
   function handleChangeContact(contact) {
 setCurrContact(contact)
-
+setcurrpage('chat');
 };
   function handleChangeUser(evt) {
 setcurrUser(evt.target.value)
@@ -121,14 +116,14 @@ setNewuser(evt.target.value)
 
 	  const addUser = (event) => {
     event.preventDefault();
-  const response = axios.get('chat.php?action=addcontact&username=' + currUser + '&newcontact=' + newUser + "&password=" + currPwd)
+  const response = axios.get(server+'chat.php?action=addcontact&username=' + currUser + '&newcontact=' + newUser + "&password=" + currPwd)
   .then(function (response) {
     // handle success
     console.log(response.data);
 //test = response.data;
-updateUsers();
+
 //setIsLoggedIn(true) QUYh4SgF
-getPage('');
+updateUsers('');
   })
   .catch(function (error) {
     // handle error
@@ -136,15 +131,13 @@ getPage('');
 
     console.log(error);
   })
-
-  getPage('');
     handleChangeUser('');
   //localhost/chat.php?action=sendmessage&username=test&sendto=test12&message=HOIII
     };
 
 	  const sendChat = (event) => {
     event.preventDefault();
-  const response = axios.get('chat.php?action=sendmessage&username=' + currUser + '&sendto=' + currContact + '&message=' + chatmessage + "&password=" + currPwd)
+  const response = axios.get(server+'chat.php?action=sendmessage&username=' + currUser + '&sendto=' + currContact + '&message=' + chatmessage + "&password=" + currPwd)
   .then(function (response) {
     // handle success
     console.log(response.data);
@@ -165,13 +158,13 @@ getPage('');
     };
 
    const div = useRef(null);
-const bottomRef = useRef(null);
+
   const [count, setCount] = useState(0);
   useEffect(() => {
     const timer = setTimeout(() => {
       const counter = count + 1;
       setCount(counter);
-      if (contacts.length > 0) { getchatsb(''); getPage(''); }
+      if (contacts.length > 0) { getchatsb(''); getPage(''); updateUsers(''); }
 
 	
    
@@ -179,62 +172,65 @@ const bottomRef = useRef(null);
     return () => clearTimeout(timer);
   }, [count]);
 
-
+ useEffect(() => {
+    // 👇️ scroll to bottom every time messages change
+    bottomRef.current?.scrollIntoView({behavior: 'smooth', block:"end"});
+  }, [chatsb]);
 
     return (
         <div className={styles.App}>
 		  <header className={styles['App-header']}>
-                    <form onSubmit={getPage}>
+                    
     <h5>SpecCMS Chatbox</h5>
-    {contacts.length < 1 &&  
+    <p style={{fontSize: '15px'}}>{currUser}</p>
+    {currpage == 'login' &&
+     <div> 
+     <form onSubmit={getPage}>
     <p style={{fontSize: '12px'}}>Please login or register to contact a friend<br />or page admin.</p>
-    }
-					  <br />
-                 {contacts.length < 1 &&  
-                 <div> 
-                <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Username</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangeUser} type="text"></input><br />
-                <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Password</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangepassword} type="password"></input><br />
-                <br /> <input style={{color:'white', backgroundColor: 'black', height: '28px', width: '250px', border: '1px solid orange'}} type="submit" value="Login / Register" /> <br /> </div>
-                 }  
-                      {contacts.length > 0 && 
-                      <div>
-                     
-                    <label style={{fontSize:'15px'}}>Chat with:</label>&nbsp;
-                    <a href='#' style={{fontSize:'15px', textDecoration: 'none', color: 'green'}} onClick={getchatsb}>{currContact}</a>  
-                      </div>}
-                </form> 
-                {contacts.length > 0 && 
-                     <div ref={div} id='chats' style={{ height: '230px', overflow: 'auto', width: '290px', border:'1px solid black', borderRadius:'3px' }} >     <br />
-                             {chatsb.slice(0, 250).reverse().map((item, index) => (
-               <p style={{ height:'auto', width: '205px',fontSize:'12px', wordWrap: 'break-word',display:'block', textAlign:'left'}}><b>{item.from}</b>:&nbsp;{item.chatmessage}</p>
-                 
+      <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Username</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangeUser} type="text"></input><br />
+      <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Password</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangepassword} type="password"></input><br />
+      <input style={{color:'white', backgroundColor: 'black', height: '28px', width: '250px', border: '1px solid orange'}} type="submit" value="Login / Register" /> <br /></form> </div>
+      }  
+    
+    {currpage=='chat' && 
+    <div>    
+    <label style={{fontSize:'15px'}}>Chat with:</label>&nbsp;
+    <a href='#' style={{fontSize:'15px', textDecoration: 'none', color: 'green'}} onClick={getchatsb}>{currContact}</a>  
+    </div>}
+    {currpage=='chat' &&   
+    <div ref={bottomRef} id='chats' style={{ scrollbarWidth: 'thin', height: '230px', overflow: 'auto', width: '290px', border:'0px solid black', borderRadius:'3px' }} >     <br />
+    {chatsb.slice(0, 250).reverse().map((item, index) => (
+               <p style={{ height:'auto', width: '205px',fontSize:'12px', wordWrap: 'break-word',display:'block', textAlign:'left', marginLeft: '2px'}}><b>{item.from}</b>:&nbsp;{item.chatmessage}</p>  
        ))}   <br />
-         </div>}<div>
-       
-          {contacts.length > 0 &&  
+         </div>}
+      
+           {currpage=='chat' &&  
           <div>  
         <form onSubmit={sendChat}>
         <label style={{fontSize:'15px'}}>Chat:</label>&nbsp;
-          <input type="text"  style={{width:'90px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
+          <input type="text"  style={{width:'130px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
           <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid green'}} type="submit" value="Send" /> <br /> 
-        </form>
-          <br /></div> }
-     </div>
-    {contacts.length > 0 &&   <label style={{fontSize:'15px'}}><b>Contacts</b></label> }
+        </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a>
+          </div> }
+   
+     {currpage == 'contacts' &&    <div><label style={{fontSize:'15px'}}><b>Contacts</b></label> 
+    <div ref={div} id='chats' style={{ height: 'auto', width: '215px', border:'0px solid black', borderRadius:'3px' }} >
           {contacts.map((item, index) => (
-
-              <div onClick={() => { setCurrContact(item.user); getchatsb(''); }} style={{fontSize:'10px', lineHeight:'25px', border: '1px solid black', height:'25px', width: '205px', display: 'block', backgroundColor: 'gray', color: 'white'}}>{item.user}&nbsp; ({item.messages})</div>
-              
-              
-        
+              <div onClick={() => { setcurrpage('chat'); setCurrContact(item.user); getchatsb('');  }} style={{fontSize:'10px', lineHeight:'25px', border: '1px solid black', height:'25px', width: '205px', display: 'block', backgroundColor: 'gray', color: 'white'}}>{item.user}&nbsp; ({item.messages})</div>
+            
        ))}
-       {contacts.length > 0 &&  
+       </div>
+       </div>}
+    
+      {currpage == 'contacts' && 
        <div>
      <form onSubmit={addUser}>
         <label style={{fontSize:'15px'}}>Add user:</label>&nbsp;
           <input type="text" style={{width:'70px'}} onChange={handleChangeNewuser} />&nbsp;
           <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid blue'}} type="submit" value="Add" /> <br /> 
-        </form>
+        </form><br />
+        <a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { setCurrContact(''); setcurrpage('login'); }}>Logout</a>
+
        </div> }
                       
              
