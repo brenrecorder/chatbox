@@ -34,7 +34,17 @@ function encrypt_decrypt($action, $string)
         }
         return $output;
     }
-	
+function RemoveDuplicates($username) {
+	$db = new SQLite3('chatserver.db');
+	 $contactlistb = $db->querySingle("SELECT Contacts as vchAmount FROM Users WHERE Username='".$username."'");
+	 $contactsIN = explode(",", $contactlistb);
+	 $contacts = array_unique($contactsIN);
+		$newcontactlist = "";
+		foreach ($contacts as $contact) {
+			$newcontactlist .= $contact . ",";
+		}
+		$db->exec("UPDATE Users SET Contacts='".$newcontactlist."' WHERE Username == '".$username."'");
+}
 if (file_exists("chatserver.db")) { //CREATE DATABASE
 	$db = new SQLite3('chatserver.db');
 } else {
@@ -87,8 +97,9 @@ if (file_exists("chatserver.db")) { //CREATE DATABASE
 		if ($pwd != md5($password)) { exit; }
 	}
 	$contactlist = $db->querySingle("SELECT Contacts as vchAmount FROM Users WHERE Username='".$username."'");
-		$contacts = explode(",", $contactlist);
+		$contactsin = explode(",", $contactlist);
 	//array_push($arrayusers, $contacts);
+	$contacts = array_unique($contactsin);
 	foreach ($contacts as $contact) {
 	if (strlen($contact) > 1) {
 		$sendmessages = $db->querySingle("SELECT COUNT(adrFrom) AS count FROM Chats WHERE adrFrom=='".$contact."' AND adrTo=='".$username."'");
@@ -132,7 +143,7 @@ $arrchats = array_reverse($arrchats);
 	if (!empty($_GET['password'])) { $password = $_GET['password']; } else { $password = ""; }
 				$pwd = $db->querySingle("SELECT Password as vchAmount FROM Users WHERE Username='".$username."'");
 		if ($pwd != md5($password)) { exit; }
-		
+		RemoveDuplicates($username);
 	if (!empty($_GET['newcontact'])) { $newcontact = $_GET['newcontact']; } else { $newcontact = ""; }
 	$idexists = $db->querySingle("SELECT COUNT(Username) AS count FROM Users WHERE Username=='".$newcontact."'");
 	if ($idexists > 0) {
@@ -140,6 +151,7 @@ $arrchats = array_reverse($arrchats);
 		if ($pwd != md5($password)) { exit; }
 		$contactlistb = $db->querySingle("SELECT Contacts as vchAmountb FROM Users WHERE Username='".$newcontact."'");
 	$contactlist = $db->querySingle("SELECT Contacts as vchAmount FROM Users WHERE Username='".$username."'");
+
 	if (strlen($newcontact) > 0 ) { $contactlist .= $newcontact . ",";   $contactlistb .= $username . ",";}
 	$db->exec("UPDATE Users SET Contacts='".$contactlist."' WHERE Username == '".$username."'");
 	$db->exec("UPDATE Users SET Contacts='".$contactlistb."' WHERE Username == '".$newcontact."'");
@@ -149,5 +161,27 @@ $arrchats = array_reverse($arrchats);
 	}
 	echo json_encode($response);
 	}
+		if ($action == 'deletecontact') { //chat.php?action=viewcontacts&username=test12
+		if (!empty($_GET['username'])) { $username = $_GET['username']; } else { $username = ""; }
+		if (!empty($_GET['password'])) { $password = $_GET['password']; } else { $password = ""; }
+		if (!empty($_GET['contactdel'])) { $contactdel = $_GET['contactdel']; } else { $contactdel = ""; }
+		$pwd = $db->querySingle("SELECT Password as vchAmount FROM Users WHERE Username='".$username."'");
+		if ($pwd != md5($password)) { exit; }
+		$contactlist = $db->querySingle("SELECT Contacts as vchAmountb FROM Users WHERE Username='".$username."'");
+		$contacts = explode(",", $contactlist);
+		//array_push($arrayusers, $contacts);
+		$newcontactlist = "";
 	
+		foreach ($contacts as $contact) {
+		if ($contactdel != $contact) {
+		$newcontactlist .= $contact . ",";
+		}
+		}
+		
+		$db->exec("UPDATE Users SET Contacts='".$newcontactlist."' WHERE Username == '".$username."'");
+		$db->exec("DELETE FROM Users WHERE Username == '".$contactdel."'");
+		$db->exec("DELETE FROM Chats WHERE adrFrom == '".$contactdel."' OR adrTo == '".$contactdel."'");
+		$response = array("response"=>"userdeleted", "username"=>$contactdel);
+		echo json_encode($response);
+		}
 	?>
