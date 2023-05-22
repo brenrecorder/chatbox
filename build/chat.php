@@ -87,8 +87,7 @@ if (file_exists("chatserver.db")) { //CREATE DATABASE
 		if ($pwd != md5($password)) { exit; }
 	}
 	$contactlist = $db->querySingle("SELECT Contacts as vchAmount FROM Users WHERE Username='".$username."'");
-		$contactsA = explode(",", $contactlist);
-		$contacts = array_unique($contactsA);
+		$contacts = explode(",", $contactlist);
 	//array_push($arrayusers, $contacts);
 	foreach ($contacts as $contact) {
 	if (strlen($contact) > 1) {
