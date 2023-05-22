@@ -7,14 +7,24 @@ import ReactDOM from "react-dom";
 import {Link } from "react-router-dom";
 import $ from 'jquery';
  import axios from "axios";
+import ScrollToBottom from 'react-scroll-to-bottom';
+import { css } from '@emotion/css'
+
+const ROOT_CSS = css({
+
+  scrollbarWidth: 'thin', 
+  height: '230px', 
+  overflow: 'auto', 
+  width: '290px', 
+  border:'0px solid black', 
+  borderRadius:'3px'
+});
 
 const Promise = require("bluebird");
 const getJson = require("axios-get-json-response");
 const cheerio = require("cheerio");
 const server = "";
 function App() {
-
- const bottomRef = useRef(null);
 
  var [currUser, setcurrUser] =useState('');
  
@@ -159,36 +169,39 @@ getPage('');
 
    const div = useRef(null);
 
+
   const [count, setCount] = useState(0);
   useEffect(() => {
     const timer = setTimeout(() => {
       const counter = count + 1;
       setCount(counter);
+ 
       if (contacts.length > 0) { getchatsb(''); getPage(''); updateUsers(''); }
-
-	
-   
     }, 1000);
     return () => clearTimeout(timer);
   }, [count]);
 
+
+
  useEffect(() => {
     // 👇️ scroll to bottom every time messages change
-    bottomRef.current?.scrollIntoView({behavior: 'smooth', block:"end"});
+  
   }, [chatsb]);
 
+
+  
     return (
         <div className={styles.App}>
 		  <header className={styles['App-header']}>
                     
-    <h5>SpecCMS Chatbox</h5>
-    <p style={{fontSize: '15px'}}>{currUser}</p>
+    <h5>Chatbox</h5>
+    <p style={{fontSize: '15px'}}>Username: {currUser}</p>
     {currpage == 'login' &&
      <div> 
      <form onSubmit={getPage}>
     <p style={{fontSize: '12px'}}>Please login or register to contact a friend<br />or page admin.</p>
       <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Username</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangeUser} type="text"></input><br />
-      <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Password</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangepassword} type="password"></input><br />
+      <label style={{color: 'green', fontSize: '12px', display:'inline-block', width: '70px'}}>Password</label>{`\t`}<input style={{width:'110px'}} onChange={handleChangepassword} type="password"></input><br /><br />
       <input style={{color:'white', backgroundColor: 'black', height: '28px', width: '250px', border: '1px solid orange'}} type="submit" value="Login / Register" /> <br /></form> </div>
       }  
     
@@ -198,25 +211,28 @@ getPage('');
     <a href='#' style={{fontSize:'15px', textDecoration: 'none', color: 'green'}} onClick={getchatsb}>{currContact}</a>  
     </div>}
     {currpage=='chat' &&   
-    <div ref={bottomRef} id='chats' style={{ scrollbarWidth: 'thin', height: '230px', overflow: 'auto', width: '290px', border:'0px solid black', borderRadius:'3px' }} >     <br />
+    <ScrollToBottom id='chats' className={ROOT_CSS}> <br />
     {chatsb.slice(0, 250).reverse().map((item, index) => (
                <p style={{ height:'auto', width: '205px',fontSize:'12px', wordWrap: 'break-word',display:'block', textAlign:'left', marginLeft: '2px'}}><b>{item.from}</b>:&nbsp;{item.chatmessage}</p>  
        ))}   <br />
-         </div>}
+         </ScrollToBottom>}
       
            {currpage=='chat' &&  
           <div>  
         <form onSubmit={sendChat}>
         <label style={{fontSize:'15px'}}>Chat:</label>&nbsp;
-          <input type="text"  style={{width:'130px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
+<input type="text"  style={{width:'130px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
           <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid green'}} type="submit" value="Send" /> <br /> 
         </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a>
           </div> }
+     {currpage == 'contacts' &&     
+ 
+     <div><label style={{fontSize:'15px'}}>
    
-     {currpage == 'contacts' &&    <div><label style={{fontSize:'15px'}}><b>Contacts</b></label> 
-    <div ref={div} id='chats' style={{ height: 'auto', width: '215px', border:'0px solid black', borderRadius:'3px' }} >
+     <b>Contacts</b></label> 
+    <div ref={div} id='chats' style={{ height: 'auto', width: '290px', border:'0px solid black', borderRadius:'3px' }} >
           {contacts.map((item, index) => (
-              <div onClick={() => { setcurrpage('chat'); setCurrContact(item.user); getchatsb('');  }} style={{fontSize:'10px', lineHeight:'25px', border: '1px solid black', height:'25px', width: '205px', display: 'block', backgroundColor: 'gray', color: 'white'}}>{item.user}&nbsp; ({item.messages})</div>
+              <div onClick={() => { setcurrpage('chat'); setCurrContact(item.user); getchatsb('');  }} style={{fontSize:'11px', lineHeight:'25px', border: '1px solid black', height:'25px', width: '290px', display: 'block', backgroundColor: 'orange', color: 'black', textDecoration: 'bold', marginTop:'3px'}}>{item.user}&nbsp; ({item.messages})</div>
             
        ))}
        </div>
@@ -225,7 +241,7 @@ getPage('');
       {currpage == 'contacts' && 
        <div>
      <form onSubmit={addUser}>
-        <label style={{fontSize:'15px'}}>Add user:</label>&nbsp;
+        <br /><label style={{fontSize:'15px'}}>Add user:</label>&nbsp;
           <input type="text" style={{width:'70px'}} onChange={handleChangeNewuser} />&nbsp;
           <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid blue'}} type="submit" value="Add" /> <br /> 
         </form><br />
