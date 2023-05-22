@@ -223,7 +223,7 @@ getPage('');
         <label style={{fontSize:'15px'}}>Chat:</label>&nbsp;
 <input type="text"  style={{width:'130px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
           <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid green'}} type="submit" value="Send" /> <br /> 
-        </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a>
+        </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { updateUsers(''); setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a>
           </div> }
      {currpage == 'contacts' &&     
  
