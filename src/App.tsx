@@ -74,13 +74,26 @@ setLoggedin(true);
     const temp = JSON.parse(JSON.stringify(response.data))
     if (temp.length != contacts.length) {
  setContacts(JSON.parse(JSON.stringify(response.data)));
+    } else {
+      
     }
   })
   .catch(function (error) {
     console.log(error);
   })
   };
-	
+	 const deleteContact = (event) => {
+    if (window.confirm('Are you sure you wish to delete this contact?')) {
+    const response = axios.get(server+'chat.php?action=deletecontact&username=' + currUser  + "&password=" + currPwd + "&contactdel=" + currContact)
+  .then(function (response) {
+    updateUsers('');
+    setcurrpage('contacts');
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
+    }
+  };
 
 	  const getchatsb = (event) => {
   
@@ -223,7 +236,8 @@ getPage('');
         <label style={{fontSize:'15px'}}>Chat:</label>&nbsp;
 <input type="text"  style={{width:'130px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
           <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid green'}} type="submit" value="Send" /> <br /> 
-        </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { updateUsers(''); setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a>
+        </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { updateUsers(''); setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a><br />
+        {currUser=='admin' && <a style={{color:'lightblue', fontSize:'15px'}} onClick={deleteContact}>Delete contact</a> }
           </div> }
      {currpage == 'contacts' &&     
  
