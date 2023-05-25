@@ -8,7 +8,10 @@ import {Link } from "react-router-dom";
 import $ from 'jquery';
  import axios from "axios";
 import ScrollToBottom from 'react-scroll-to-bottom';
-import { css } from '@emotion/css'
+import { css } from '@emotion/css';
+import { render } from 'react-dom';
+import data from '@emoji-mart/data'
+import Picker from '@emoji-mart/react'
 
 const ROOT_CSS = css({
 
@@ -23,7 +26,7 @@ const ROOT_CSS = css({
 const Promise = require("bluebird");
 const getJson = require("axios-get-json-response");
 const cheerio = require("cheerio");
-const server = "";
+const server = "http://tbwebspecialist.nl/chatbox/";
 function App() {
 
  var [currUser, setcurrUser] =useState('');
@@ -36,7 +39,7 @@ function App() {
       var [contacts, setContacts] =useState([]);
       var [currpage, setcurrpage] =useState('login');
       var [chatsb, setChats] = useState([]);
-           var [chatmessage, setChatMessage] = useState([]);
+           var [chatmessage, setChatMessage] = useState('');
     var [newUser, setNewuser] = useState([]);
       
     const setPage = (title) => {
@@ -165,7 +168,7 @@ updateUsers('');
     // handle success
     console.log(response.data);
 //test = response.data;
-setChatMessage([]);
+setChatMessage('');
 getchatsb('');
 getPage('');
 //setIsLoggedIn(true) QUYh4SgF
@@ -201,7 +204,15 @@ getPage('');
   
   }, [chatsb]);
 
+  
+  const [showEmoji, setShowEmoji] = useState(false)
 
+  const addEmoji = emoji => {
+    console.log(emoji)
+  
+    setChatMessage(chatmessage + emoji.native)
+    setShowEmoji(false)
+  }
   
     return (
         <div className={styles.App}>
@@ -223,22 +234,23 @@ getPage('');
     <label style={{fontSize:'15px'}}>Chat with:</label>&nbsp;
     <a href='#' style={{fontSize:'15px', textDecoration: 'none', color: 'green'}} onClick={getchatsb}>{currContact}</a>  
     </div>}
-    {currpage=='chat' &&   
+    {currpage=='chat' && !showEmoji && ( 
     <ScrollToBottom id='chats' className={ROOT_CSS}> <br />
     {chatsb.slice(0, 250).reverse().map((item, index) => (
                <p style={{ height:'auto', width: '205px',fontSize:'12px', wordWrap: 'break-word',display:'block', textAlign:'left', marginLeft: '2px'}}><b>{item.from}</b>:&nbsp;{item.chatmessage}</p>  
        ))}   <br />
-         </ScrollToBottom>}
+         </ScrollToBottom>)}
       
-           {currpage=='chat' &&  
-          <div>  
-        <form onSubmit={sendChat}>
-        <label style={{fontSize:'15px'}}>Chat:</label>&nbsp;
-<input type="text"  style={{width:'130px'}} value={chatmessage} onChange={handleChangeChat} />&nbsp;
-          <input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid green'}} type="submit" value="Send" /> <br /> 
-        </form><br /><a style={{color:'lightblue', fontSize:'15px'}}onClick={() => { updateUsers(''); setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a><br />
+           {currpage=='chat' &&  (<div><form onSubmit={sendChat}><label style={{fontSize:'15px'}}>Chat:</label>&nbsp;
+<input type="text"  style={{width:'130px'}} value={chatmessage}  onChange={e => setChatMessage(e.target.value)} />&nbsp;<input style={{color:'white', backgroundColor: 'black', height: '25px', width: '70px', border: '1px solid green'}} type="submit" value="Send" /><br /> 
+        </form>
+        {!showEmoji && ( <a style={{color:'lightblue', fontSize:'15px'}} onClick={() => setShowEmoji(!showEmoji)}>Emoticon</a> )}
+        {showEmoji && ( <a style={{color:'lightblue', fontSize:'15px'}} onClick={() => setShowEmoji(!showEmoji)}>Close emoticons</a> )}
+      {showEmoji && (  <Picker maxFrequentRows='2' theme='dark' searchPosition='none' navPosition='none' previewPosition='none' onEmojiSelect={addEmoji} emojiButtonSize='24' emojiSize='24'/>)}
+      <br />
+      <a style={{color:'lightblue', fontSize:'15px'}} onClick={() => { updateUsers(''); setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a><br />
         {currUser=='admin' && <a style={{color:'lightblue', fontSize:'15px'}} onClick={deleteContact}>Delete contact</a> }
-          </div> }
+          </div>)}
      {currpage == 'contacts' &&     
  
      <div><label style={{fontSize:'15px'}}>
