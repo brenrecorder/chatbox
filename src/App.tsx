@@ -218,8 +218,8 @@ getPage('');
         <div className={styles.App}>
 		  <header className={styles['App-header']}>
                     
-    <h5>Chatbox</h5>
-    <p style={{fontSize: '15px'}}>Username: {currUser}</p>
+     {!showEmoji && (<div><h5>Chatbox</h5>
+    <p style={{fontSize: '15px'}}>Username: {currUser}</p></div>)}
     {currpage == 'login' &&
      <div> 
      <form onSubmit={getPage}>
@@ -229,7 +229,7 @@ getPage('');
       <input style={{color:'white', backgroundColor: 'black', height: '28px', width: '250px', border: '1px solid orange'}} type="submit" value="Login / Register" /> <br /></form> </div>
       }  
     
-    {currpage=='chat' && 
+    {currpage=='chat' && !showEmoji &&
     <div>    
     <label style={{fontSize:'15px'}}>Chat with:</label>&nbsp;
     <a href='#' style={{fontSize:'15px', textDecoration: 'none', color: 'green'}} onClick={getchatsb}>{currContact}</a>  
@@ -246,7 +246,7 @@ getPage('');
         </form>
         {!showEmoji && ( <a style={{color:'lightblue', fontSize:'15px'}} onClick={() => setShowEmoji(!showEmoji)}>Emoticon</a> )}
         {showEmoji && ( <a style={{color:'lightblue', fontSize:'15px'}} onClick={() => setShowEmoji(!showEmoji)}>Close emoticons</a> )}
-      {showEmoji && (  <Picker maxFrequentRows='2' theme='dark' searchPosition='none' navPosition='none' previewPosition='none' onEmojiSelect={addEmoji} emojiButtonSize='24' emojiSize='24'/>)}
+      {showEmoji && (  <Picker height='250px' maxFrequentRows='2' theme='dark' searchPosition='none' navPosition='none' previewPosition='none' onEmojiSelect={addEmoji} emojiButtonSize='24' emojiSize='24'/>)}
       <br />
       <a style={{color:'lightblue', fontSize:'15px'}} onClick={() => { updateUsers(''); setCurrContact(''); setcurrpage('contacts'); }}>Exit chat</a><br />
         {currUser=='admin' && <a style={{color:'lightblue', fontSize:'15px'}} onClick={deleteContact}>Delete contact</a> }
