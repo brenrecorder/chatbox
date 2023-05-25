@@ -4,6 +4,7 @@
 </div>
 
 Chatbox with php server (json type) for use on your webpage (upload with ftp) don't forget 'chat.php'
+demo: http://tbwebspecialist.nl/chatbox/
 
 ### `npm install`
 to add the node_modules folder
