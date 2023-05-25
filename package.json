@@ -9,10 +9,12 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "@emotion/css": "^11.11.0",
     "axios": "^1.4.0",
     "axios-get-json-response": "^1.0.1",
     "cheerio": "^1.0.0-rc.12",
     "classnames": "^2.3.2",
+    "emoji-mart": "^5.5.2",
     "emoji-picker-react": "^4.4.9",
     "emotion": "^11.0.0",
     "jquery": "^3.7.0",
